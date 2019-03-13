@@ -10,112 +10,112 @@ def train( bot ):
 
 	chatbot.train([
 		'Barice',
-		'Izvoli?'
+		'izvoli'
 	])
 
 	chatbot.train([
 		'Marice',
-		'Izvoli?'
+		'izvoli'
 	])
 
 
 	chatbot.train([
 		'Zorice',
-		'Izvoli?'
+		'izvoli'
 	])
 
 
 	chatbot.train([
 		'Starice',
-		'Izvoli?'
+		'izvoli'
 	])
 
 
 	chatbot.train([
 		'Varice',
-		'Izvoli?'
+		'izvoli?'
 	])
 
 	chatbot.train([
 		'Reci mi nešto općenito o FOI-u',
-		'Fakultet organizacije i informatike....'
+		'foi'
 	])
 
 	chatbot.train([
 		'Reci mi nešto o FOI-u',
-		'Fakultet organizacije i informatike....'
+		'foi'
 	])
 
 
 	chatbot.train([
 		'FOI',
-		'Fakultet organizacije i informatike....?'
+		'foi'
 	])
 
 
 	chatbot.train([
 		'Trebam naći dvoranu',
-		'Koja dvorana?'
+		'dvorana'
 	])
 
 	chatbot.train([
 		'Trebam dvoranu',
-		'Koja dvorana?'
+		'dvorana'
 	])
 
 	chatbot.train([
 		'Gdje je dvorana',
-		'Koja dvorana?'
+		'dvorana'
 	])
 
 	chatbot.train([
 		'Dvorana',
-		'Koja dvorana?'
+		'dvorana'
 	])
 
 
 	chatbot.train([
 		'Trebam naći profesora',
-		'Koji profesor?'
+		'profesor'
 	])
 
 	chatbot.train([
 		'Trebam naći jednog profesora',
-		'Koji profesor?'
+		'profesor'
 	])
 
 	chatbot.train([
 		'Trebam profesora',
-		'Koji profesor?'
+		'profesor'
 	])
 
 	chatbot.train([
 		'Profesor',
-		'Koji profesor?'
+		'profesor'
 	])
 
 	chatbot.train([
 		'Trebam raspored',
-		'Za koji vrstu studija trebaš raspored?'
+		'raspored'
 	])
 
 	chatbot.train([
 		'Molim raspored',
-		'Za koji vrstu studija trebaš raspored?'
+		'raspored'
 	])
 
 	chatbot.train([
 		'Trebam svoj raspored',
-		'Za koji vrstu studija trebaš raspored?'
+		'raspored'
 	])
 
 	chatbot.train([
 		'Molim te raspored',
-		'Za koji vrstu studija trebaš raspored?'
+		'raspored'
 	])
 
 	chatbot.train([
 		'Raspored',
-		'Za koji vrstu studija trebaš raspored?'
+		'raspored'
 	])
 

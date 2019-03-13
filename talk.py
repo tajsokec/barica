@@ -6,6 +6,9 @@ import argparse
 
 import sys
 
+from dictionary import *
+d = dictionary()
+
 class FiniteStateMachine:
     
     states = ['listen', 'yes', 'foi_generally', 'which_classroom', 'classroom', 'which_professor',
@@ -48,28 +51,28 @@ class FiniteStateMachine:
 
 def main_branch(SENTENCE):
     CMD = chatbot.get_response( SENTENCE )
-    if CMD == 'Izvoli?':
+    if CMD in d['Izvoli']:
         m.barice_input()
-        print(CMD)
-    elif CMD == 'Fakultet organizacije i informatike....':
+        print(d['Izvoli'][CMD])
+    elif CMD in d['FOI']:
         m.foi_input()
-        print(CMD)
-    elif CMD == 'Koja dvorana?':
+        print(d['FOI'][CMD])
+    elif CMD in d['Dvorana']:
         m.classroom_input()
-        print(CMD)
-    elif CMD == 'Koji profesor?':
+        print(d['Dvorana'][CMD])
+    elif CMD in d['Profesor']:
         m.professor_input()
-        print(CMD)
-    elif CMD == 'Za koji vrstu studija trebaš raspored?':
+        print(d['Profesor'][CMD])
+    elif CMD in d['Raspored']:
         m.schedule_input()       
-        print(CMD)
+        print(d['Raspored'][CMD])
     else: return False
 
 def classroom_branch(SENTENCE):
     CMD = chatbotClassroom.get_response( SENTENCE )
-    if CMD == 'Dvorana 9 nalazi se ...':
+    if CMD in d['Classrooms']:
         m.classroomN_input()
-        print(CMD)
+        print(d['Classrooms'][CMD])
     else: return False
     
 def professor_branch(SENTENCE):
