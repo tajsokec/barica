@@ -6,8 +6,18 @@ import argparse
 
 import sys
 
+from time import sleep
+
+import pyperclip as cp
+
 from dictionary import *
 d = dictionary()
+
+# Last sentence
+LAST_SENTENCE = ''
+
+# First input is not heard
+FIRTS = True
 
 class FiniteStateMachine:
     
@@ -95,6 +105,39 @@ def schedule_branch(SENTENCE):
         print(CMD)
     else: print(CMD)
 
+def processing_input():
+    global LAST_SENTENCE
+    SENTENCE = LAST_SENTENCE
+    
+    if SENTENCE == 'exit': sys.exit()
+        
+    if m.state == 'listen' or  m.state == 'yes':
+        if main_branch(SENTENCE) == False:
+            err_handler(SENTENCE)
+
+    elif m.state == 'which_classroom':
+         if classroom_branch(SENTENCE) == False:
+             err_handler(SENTENCE)
+
+    elif m.state == 'which_professor':
+        if professor_branch(SENTENCE) == False:
+            err_handler(SENTENCE)                                 
+
+    elif m.state == 'which_kind_of_study' or m.state == 'which_year_of_study' or m.state == 'which_group':
+        if schedule_branch(SENTENCE) == False:
+            err_handler(SENTENCE)
+
+def listen():
+    global LAST_SENTENCE
+    sleep( 0.5 )
+    l = cp.paste().lower()
+    if l != LAST_SENTENCE:
+            x = LAST_SENTENCE
+            LAST_SENTENCE = l
+            print( 'Heard:', l )
+            if x is not '':
+                processing_input()
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -133,7 +176,7 @@ if __name__ == '__main__':
         },
         {
             'import_path': 'chatterbot.logic.LowConfidenceAdapter',
-            'threshold': 0.80,
+            'threshold': 0.75,
             'default_response': 'Ponovi unos molim.'
         }
     ],
@@ -160,30 +203,10 @@ if __name__ == '__main__':
     while True:
         
         '''try:'''        
-        SENTENCE = input()
+        listen()
 
-        if SENTENCE == 'exit': sys.exit()
         
-        if m.state == 'listen' or  m.state == 'yes':
-            if main_branch(SENTENCE) == False:
-                err_handler(SENTENCE)
-
-        elif m.state == 'which_classroom':
-             if classroom_branch(SENTENCE) == False:
-                 err_handler(SENTENCE)
-
-        elif m.state == 'which_professor':
-            if professor_branch(SENTENCE) == False:
-                err_handler(SENTENCE)                                 
-
-        elif m.state == 'which_kind_of_study' or m.state == 'which_year_of_study' or m.state == 'which_group':
-            if schedule_branch(SENTENCE) == False:
-                err_handler(SENTENCE)
                 
         '''except Exception:
             pass
             print('Ponovi unos')'''
-            
-
-    
-        

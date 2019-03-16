@@ -99,6 +99,11 @@ def trainClassroom( bot ):
 	])
 
 	chatbot.train([
+		'25',
+		'lab5'
+	])
+
+	chatbot.train([
 		'laptop',
 		'lab5'
 	])

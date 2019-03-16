@@ -32,3 +32,32 @@ def trainProfessor( bot ):
                                 'profesor ' + name,
                                 user_name
                                 ])
+
+        chatbot.train([
+		'marcus hutchins',
+		'mschatte#nastavnici'
+	])
+
+        chatbot.train([
+		'marcus sa tim',
+		'mschatte#nastavnici'
+	])
+
+        chatbot.train([
+		'marcus',
+		'mschatte#nastavnici'
+	])
+
+        chatbot.train([
+		'mišu reko',
+		'mdzeko#nastavnici'
+	])
+
+        chatbot.train([
+		'miš u džepu',
+		'mdzeko#nastavnici'
+	])
+
+
+
+        
