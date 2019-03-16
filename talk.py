@@ -66,21 +66,21 @@ def main_branch(SENTENCE):
     elif CMD in d['Raspored']:
         m.schedule_input()       
         print(d['Raspored'][CMD])
-    else: return False
+    else: print(CMD)
 
 def classroom_branch(SENTENCE):
     CMD = chatbotClassroom.get_response( SENTENCE )
     if CMD in d['Classrooms']:
         m.classroomN_input()
         print(d['Classrooms'][CMD])
-    else: return False
+    else: print(CMD)
     
 def professor_branch(SENTENCE):
     CMD = chatbotProfessor.get_response( SENTENCE )
-    if CMD == 'Profesor Zlatko Stapić nalazi se ..':
+    if CMD in d['Professors']:
         m.professorN_input()
-        print(CMD)
-    else: return False
+        print(d['Professors'][CMD])
+    else: print(CMD)
 
 def schedule_branch(SENTENCE):
     CMD = chatbotSchedule.get_response( SENTENCE )
@@ -93,12 +93,7 @@ def schedule_branch(SENTENCE):
     elif CMD == 'Izvoli raspored..':
         m.groupN_input()
         print(CMD)
-    else: return False
-
-def err_handler(SENTENCE):
-    if SENTENCE == 'exit':
-        sys.exit()
-    else: print ('Ponovi unos molim')
+    else: print(CMD)
 
 if __name__ == '__main__':
 
@@ -108,10 +103,46 @@ if __name__ == '__main__':
 
     TRAIN = bool( args.train )
 
-    chatbot = ChatBot( 'BARICA_HR', read_only=not TRAIN, database='db.sqlite3' )
-    chatbotClassroom = ChatBot( 'BARICA_HR_CLASSROOM', read_only=not TRAIN, database='dbC.sqlite3')
-    chatbotProfessor = ChatBot( 'BARICA_HR_PROFESSOR', read_only=not TRAIN, database='dbP.sqlite3' )
-    chatbotSchedule= ChatBot( 'BARICA_HR_SCHEDULE', read_only=not TRAIN, database='dbS.sqlite3' )
+    la = [
+        {
+            'import_path': 'chatterbot.logic.BestMatch'
+        },
+        {
+            'import_path': 'chatterbot.logic.LowConfidenceAdapter',
+            'threshold': 0.65,
+            'default_response': 'Ponovi unos molim.'
+        }
+    ]
+
+    chatbot = ChatBot(
+        'BARICA_HR',
+        read_only=not TRAIN,
+        logic_adapters=la,
+        database='db.sqlite3' )
+    chatbotClassroom = ChatBot(
+        'BARICA_HR_CLASSROOM',
+        read_only=not TRAIN,
+        logic_adapters=la,
+        database='dbC.sqlite3')
+    chatbotProfessor = ChatBot(
+        'BARICA_HR_PROFESSOR',
+        read_only=not TRAIN,
+        logic_adapters=[
+        {
+            'import_path': 'chatterbot.logic.BestMatch'
+        },
+        {
+            'import_path': 'chatterbot.logic.LowConfidenceAdapter',
+            'threshold': 0.80,
+            'default_response': 'Ponovi unos molim.'
+        }
+    ],
+        database='dbP.sqlite3' )
+    chatbotSchedule= ChatBot(
+        'BARICA_HR_SCHEDULE',
+        read_only=not TRAIN,
+        logic_adapters=la,
+        database='dbS.sqlite3' )
 
     if TRAIN:
             from train import *
@@ -128,28 +159,30 @@ if __name__ == '__main__':
     
     while True:
         
-        try:        
-            SENTENCE = input()
-            
-            if m.state == 'listen' or  m.state == 'yes':
-                if main_branch(SENTENCE) == False:
-                    err_handler(SENTENCE)
+        '''try:'''        
+        SENTENCE = input()
 
-            elif m.state == 'which_classroom':
-                 if classroom_branch(SENTENCE) == False:
-                     err_handler(SENTENCE)
+        if SENTENCE == 'exit': sys.exit()
+        
+        if m.state == 'listen' or  m.state == 'yes':
+            if main_branch(SENTENCE) == False:
+                err_handler(SENTENCE)
 
-            elif m.state == 'which_professor':
-                if professor_branch(SENTENCE) == False:
-                    err_handler(SENTENCE)                                 
+        elif m.state == 'which_classroom':
+             if classroom_branch(SENTENCE) == False:
+                 err_handler(SENTENCE)
 
-            elif m.state == 'which_kind_of_study' or m.state == 'which_year_of_study' or m.state == 'which_group':
-                if schedule_branch(SENTENCE) == False:
-                    err_handler(SENTENCE)
+        elif m.state == 'which_professor':
+            if professor_branch(SENTENCE) == False:
+                err_handler(SENTENCE)                                 
+
+        elif m.state == 'which_kind_of_study' or m.state == 'which_year_of_study' or m.state == 'which_group':
+            if schedule_branch(SENTENCE) == False:
+                err_handler(SENTENCE)
                 
-        except Exception:
+        '''except Exception:
             pass
-            print('Ponovi unos')
+            print('Ponovi unos')'''
             
 
     

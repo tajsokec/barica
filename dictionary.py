@@ -34,6 +34,15 @@ d = {'Izvoli': {
     'd8': 'Dvorana osam se nalazi na drugom katu, između južnog i istočnog krila, u kutu',
     'd3': 'Dvorana tri se nalazi na drugom katu, u južnom krilu zgrade'}}
 
+from ScrapProfesssors import *
+professors = scrapProfessors()
+
+prof = {}
+for name, user_name in professors.items():
+        prof[user_name] = 'Izvoli podatke za ' + name
+
+d['Professors'] = prof
+        
 def dictionary():
         return d
 
