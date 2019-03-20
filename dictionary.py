@@ -2,7 +2,7 @@
 d = {'Izvoli': {
     'izvoli': 'Izvoli?'},
      'FOI': {
-         'foi': 'Faklutet organizacije i informatike....'},
+         'foi': 'Faklutet organizacije i informatike jedna je od sastavnica Sveučilišta u Zagrebu. FOI je visokoobrazovna ustanova u interdisciplinarnom području informatike, organizacije i poslovanja. Studijski programi utemeljeni su na modernim svjetskim modelima, načelima Bolonjske deklaracije i ECTS bodovnom sustavu.'},
      'Dvorana': {
          'dvorana': 'Koja dvorana?'},
      'Profesor': {

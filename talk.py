@@ -10,11 +10,23 @@ from time import sleep
 
 import pyperclip as cp
 
+from pyautogui import press
+
+import webbrowser
+
+import subprocess
+
+import os
+
+from selenium import webdriver
+# Global driver 
+DRIVER = None
+
 from dictionary import *
 d = dictionary()
 
 # Last sentence
-LAST_SENTENCE = ''
+LAST_SENTENCE = 'First input'
 
 # First input is not heard
 FIRTS = True
@@ -27,27 +39,42 @@ class FiniteStateMachine:
     def __init__(self):
 
         # Initialize the state machine
-        self.machine = Machine(model=self, states=FiniteStateMachine.states, initial='listen')
+        self.machine = Machine(model=self, states=FiniteStateMachine.states,
+                               initial='listen')
         
         # Add transitions (trigger, source_state, destination_state)
         self.machine.add_transition('barice_input', 'listen', 'yes')
         
-        self.machine.add_transition('foi_input', 'yes', 'foi_generally', after='foi_generally_output')
+        self.machine.add_transition('foi_input', 'yes', 'foi_generally',
+                                    after='foi_generally_output')
         
         self.machine.add_transition('classroom_input', 'yes', 'which_classroom')
-        self.machine.add_transition('classroomN_input', 'which_classroom', 'classroom', after='classroom_output')
+        self.machine.add_transition('classroomN_input', 'which_classroom', 'classroom',
+                                    after='classroom_output')
         
         self.machine.add_transition('professor_input', 'yes', 'which_professor')
-        self.machine.add_transition('professorN_input', 'which_professor', 'professor', after='professor_output')
+        self.machine.add_transition('professorN_input', 'which_professor', 'professor',
+                                    after='professor_output')
         
         self.machine.add_transition('schedule_input', 'yes', 'which_kind_of_study')
-        self.machine.add_transition('kind_of_study_input', 'which_kind_of_study', 'which_year_of_study')
-        self.machine.add_transition('year_of_study_input', 'which_year_of_study', 'which_group')
-        self.machine.add_transition('groupN_input', 'which_group', 'schedule', after='schedule_output')
+        self.machine.add_transition('kind_of_study_input', 'which_kind_of_study',
+                                    'which_year_of_study')
+        self.machine.add_transition('year_of_study_input', 'which_year_of_study',
+                                    'which_group')
+        self.machine.add_transition('groupN_input', 'which_group', 'schedule',
+                                    after='schedule_output')
 
         self.machine.add_transition('listen_input', '*', 'listen')
 
     def foi_generally_output(self):
+        p = subprocess.Popen(['hovercraft', 'slides\\foi_generally.rst', 'build'])
+        sleep(1)
+        
+        dirname = os.path.dirname(os.path.abspath(__file__))
+        filename = os.path.join(dirname, 'build/index.html')
+        
+        DRIVER.get(filename)
+        DRIVER.refresh()
         self.listen_input()
 
     def classroom_output(self):
@@ -59,6 +86,17 @@ class FiniteStateMachine:
     def schedule_output(self):
         self.listen_input()
 
+def initial():
+    p = subprocess.Popen(['hovercraft', 'slides\\listen.rst', 'build'])
+    print(p)
+
+    sleep(5)
+    
+    dirname = os.path.dirname(os.path.abspath(__file__))
+    filename = os.path.join(dirname, 'build/index.html#/step-1')
+    DRIVER.get(filename)
+    DRIVER.refresh()
+    
 def main_branch(SENTENCE):
     CMD = chatbot.get_response( SENTENCE )
     if CMD in d['Izvoli']:
@@ -111,21 +149,14 @@ def processing_input():
     
     if SENTENCE == 'exit': sys.exit()
         
-    if m.state == 'listen' or  m.state == 'yes':
-        if main_branch(SENTENCE) == False:
-            err_handler(SENTENCE)
+    if m.state == 'listen' or  m.state == 'yes': main_branch(SENTENCE)
+        
+    elif m.state == 'which_classroom': classroom_branch(SENTENCE)
 
-    elif m.state == 'which_classroom':
-         if classroom_branch(SENTENCE) == False:
-             err_handler(SENTENCE)
-
-    elif m.state == 'which_professor':
-        if professor_branch(SENTENCE) == False:
-            err_handler(SENTENCE)                                 
+    elif m.state == 'which_professor': professor_branch(SENTENCE)                          
 
     elif m.state == 'which_kind_of_study' or m.state == 'which_year_of_study' or m.state == 'which_group':
-        if schedule_branch(SENTENCE) == False:
-            err_handler(SENTENCE)
+        schedule_branch(SENTENCE)
 
 def listen():
     global LAST_SENTENCE
@@ -133,9 +164,9 @@ def listen():
     l = cp.paste().lower()
     if l != LAST_SENTENCE:
             x = LAST_SENTENCE
-            LAST_SENTENCE = l
-            print( 'Heard:', l )
-            if x is not '':
+            LAST_SENTENCE = l            
+            if x is not 'First input':
+                print( 'Heard:', l )
                 processing_input()
 
 if __name__ == '__main__':
@@ -199,6 +230,10 @@ if __name__ == '__main__':
             sys.exit()
     
     m = FiniteStateMachine()
+
+    # Change to execute in the browser
+    DRIVER = webdriver.Chrome()
+    initial()
     
     while True:
         
