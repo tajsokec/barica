@@ -25,6 +25,8 @@ DRIVER = None
 from dictionary import *
 d = dictionary()
 
+from ScrapProfesssor import *
+
 # Last sentence
 LAST_SENTENCE = 'First input'
 
@@ -68,11 +70,9 @@ class FiniteStateMachine:
 
     def foi_generally_output(self):
         p = subprocess.Popen(['hovercraft', 'slides\\foi_generally.rst', 'build'])
-        sleep(1)
-        
+        sleep(1)     
         dirname = os.path.dirname(os.path.abspath(__file__))
-        filename = os.path.join(dirname, 'build/index.html')
-        
+        filename = os.path.join(dirname, 'build/index.html')        
         DRIVER.get(filename)
         DRIVER.refresh()
         self.listen_input()
@@ -81,6 +81,13 @@ class FiniteStateMachine:
         self.listen_input()
 
     def professor_output(self):
+        p = subprocess.Popen(['hovercraft', 'slides\\professor.rst', 'build'])
+        sleep(1)
+        scrapProfessors(self.professor)
+        dirname = os.path.dirname(os.path.abspath(__file__))
+        filename = os.path.join(dirname, 'build/index.html')        
+        DRIVER.get(filename)
+        DRIVER.refresh()
         self.listen_input()
 
     def schedule_output(self):
@@ -89,9 +96,7 @@ class FiniteStateMachine:
 def initial():
     p = subprocess.Popen(['hovercraft', 'slides\\listen.rst', 'build'])
     print(p)
-
-    sleep(5)
-    
+    sleep(5)    
     dirname = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(dirname, 'build/index.html#/step-1')
     DRIVER.get(filename)
@@ -126,6 +131,7 @@ def classroom_branch(SENTENCE):
 def professor_branch(SENTENCE):
     CMD = chatbotProfessor.get_response( SENTENCE )
     if CMD in d['Professors']:
+        m.professor = CMD
         m.professorN_input()
         print(d['Professors'][CMD])
     else: print(CMD)

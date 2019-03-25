@@ -3,8 +3,6 @@ import urllib.request
 
 from bs4 import BeautifulSoup
 
-import csv
-
 def scrapProfessors():
 
     urlpage =  'https://nastava.foi.hr/'

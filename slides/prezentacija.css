@@ -50,6 +50,10 @@ a {
     color: black;
 }
 
+table {
+	font-size: 50%;
+}
+
 #ThreeD H1 {
     font-family: Racing Sans One;
     font-size: 300%;
