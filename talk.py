@@ -27,13 +27,32 @@ d = dictionary()
 
 from ScrapProfesssor import *
 
+from ScrapGroups import *
+
+from ScrapSchedule import *
+
 # Last sentence
 LAST_SENTENCE = 'First input'
 
 # First input is not heard
 FIRTS = True
 
+startupinfo = subprocess.STARTUPINFO()
+startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+
+def refresh(slide):
+    p = subprocess.Popen(['hovercraft', os.path.join('slides', slide), 'build'],
+                         startupinfo=startupinfo)
+    sleep(1)
+    dirname = os.path.dirname(os.path.abspath(__file__))
+    filename = os.path.join(dirname, 'build/index.html')
+    if DRIVER is not None:
+        DRIVER.get(filename)
+        DRIVER.refresh()
+
 class FiniteStateMachine:
+
+    refresh('professor.rst')
     
     states = ['listen', 'yes', 'foi_generally', 'which_classroom', 'classroom', 'which_professor',
               'professor', 'which_kind_of_study', 'which_year_of_study', 'which_group', 'schedule']
@@ -58,58 +77,69 @@ class FiniteStateMachine:
         self.machine.add_transition('professorN_input', 'which_professor', 'professor',
                                     after='professor_output')
         
-        self.machine.add_transition('schedule_input', 'yes', 'which_kind_of_study')
+        self.machine.add_transition('schedule_input', 'yes', 'which_kind_of_study',
+                                    after='kind_of_study_output')
         self.machine.add_transition('kind_of_study_input', 'which_kind_of_study',
-                                    'which_year_of_study')
+                                    'which_year_of_study', after='year_of_study_output')
         self.machine.add_transition('year_of_study_input', 'which_year_of_study',
-                                    'which_group')
+                                    'which_group', after='groupN_output')
         self.machine.add_transition('groupN_input', 'which_group', 'schedule',
                                     after='schedule_output')
 
         self.machine.add_transition('listen_input', '*', 'listen')
 
     def foi_generally_output(self):
-        p = subprocess.Popen(['hovercraft', 'slides\\foi_generally.rst', 'build'])
-        sleep(1)     
-        dirname = os.path.dirname(os.path.abspath(__file__))
-        filename = os.path.join(dirname, 'build/index.html')        
-        DRIVER.get(filename)
-        DRIVER.refresh()
+        refresh('foi_generally.rst')
+        print(d['FOI'][self.CMD])
         self.listen_input()
 
     def classroom_output(self):
         self.listen_input()
 
     def professor_output(self):
-        p = subprocess.Popen(['hovercraft', 'slides\\professor.rst', 'build'])
+        p = subprocess.Popen(['hovercraft', os.path.join('slides', 'professor.rst'), 'build'],
+                         startupinfo=startupinfo)
         sleep(1)
         scrapProfessors(self.professor)
         dirname = os.path.dirname(os.path.abspath(__file__))
-        filename = os.path.join(dirname, 'build/index.html')        
+        filename = os.path.join(dirname, 'build/index.html')
         DRIVER.get(filename)
         DRIVER.refresh()
+        print(d['Profesori'][self.CMD])
         self.listen_input()
+
+    def kind_of_study_output(self):
+        refresh('kind_of_study.rst')
+        print(d['Raspored'][self.CMD])
+
+    def year_of_study_output(self):
+        refresh('year_of_study.rst')
+        print(d['Vrsta_studija'][self.CMD])
+
+    def groupN_output(self):
+        there_is_schedule = scrapGroups(str(self.kind_of_study), str(self.year_of_study))
+        if there_is_schedule:
+            refresh('groupN.rst')
+            print(d['Godina_studija'][self.CMD])
+        else:
+            refresh('no_schedule.rst')
+            print('Raspored nedostupan')
+            self.listen_input()
 
     def schedule_output(self):
+        scrapSchedule(str(self.kind_of_study), str(self.year_of_study), str(self.group))
+        refresh('schedule.rst')
+        print(d['Grupa'][self.CMD])
         self.listen_input()
-
-def initial():
-    p = subprocess.Popen(['hovercraft', 'slides\\listen.rst', 'build'])
-    print(p)
-    sleep(5)    
-    dirname = os.path.dirname(os.path.abspath(__file__))
-    filename = os.path.join(dirname, 'build/index.html#/step-1')
-    DRIVER.get(filename)
-    DRIVER.refresh()
     
 def main_branch(SENTENCE):
     CMD = chatbot.get_response( SENTENCE )
+    m.CMD = CMD
     if CMD in d['Izvoli']:
         m.barice_input()
         print(d['Izvoli'][CMD])
     elif CMD in d['FOI']:
         m.foi_input()
-        print(d['FOI'][CMD])
     elif CMD in d['Dvorana']:
         m.classroom_input()
         print(d['Dvorana'][CMD])
@@ -118,42 +148,44 @@ def main_branch(SENTENCE):
         print(d['Profesor'][CMD])
     elif CMD in d['Raspored']:
         m.schedule_input()       
-        print(d['Raspored'][CMD])
     else: print(CMD)
 
 def classroom_branch(SENTENCE):
     CMD = chatbotClassroom.get_response( SENTENCE )
-    if CMD in d['Classrooms']:
+    if CMD in d['Dvorane']:
         m.classroomN_input()
-        print(d['Classrooms'][CMD])
+        print(d['Dvorane'][CMD])
     else: print(CMD)
     
 def professor_branch(SENTENCE):
     CMD = chatbotProfessor.get_response( SENTENCE )
-    if CMD in d['Professors']:
+    m.CMD = CMD
+    if CMD in d['Profesori']:
         m.professor = CMD
         m.professorN_input()
-        print(d['Professors'][CMD])
     else: print(CMD)
 
 def schedule_branch(SENTENCE):
     CMD = chatbotSchedule.get_response( SENTENCE )
-    if CMD == 'Za koju godinu studija trebaš raspored?':
+    m.CMD = CMD
+    if CMD in d['Vrsta_studija']:
+        m.kind_of_study = CMD
         m.kind_of_study_input()
-        print(CMD)
-    elif CMD == 'Za koji grupu trebaš raspored?':
+    elif CMD in d['Godina_studija']:
+        m.year_of_study = CMD
         m.year_of_study_input()
-        print(CMD)
-    elif CMD == 'Izvoli raspored..':
+    elif CMD in d['Grupa']:
+        m.group = CMD
         m.groupN_input()
-        print(CMD)
     else: print(CMD)
 
 def processing_input():
     global LAST_SENTENCE
     SENTENCE = LAST_SENTENCE
     
-    if SENTENCE == 'exit': sys.exit()
+    if SENTENCE == 'exit':
+        DRIVER.close()
+        sys.exit()
         
     if m.state == 'listen' or  m.state == 'yes': main_branch(SENTENCE)
         
@@ -237,17 +269,14 @@ if __name__ == '__main__':
     
     m = FiniteStateMachine()
 
-    # Change to execute in the browser
+    # Change to execute in the another browser
     DRIVER = webdriver.Chrome()
-    initial()
+    refresh('listen.rst')
     
     while True:
         
         '''try:'''        
-        listen()
-
-        
-                
+        listen()               
         '''except Exception:
             pass
             print('Ponovi unos')'''

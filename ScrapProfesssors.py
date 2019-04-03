@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 
 def scrapProfessors():
 
+    print('--> SCRAP PROFESSORS')
+
     urlpage =  'https://nastava.foi.hr/'
 
     page = urllib.request.urlopen(urlpage)

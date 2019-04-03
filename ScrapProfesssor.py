@@ -7,6 +7,8 @@ import codecs
 
 def scrapProfessors(user_name):
 
+    print('--> SCRAP PROFESSOR')
+
     urlpage =  (str('https://nastava.foi.hr/?username=') + str(user_name))
 
     page = urllib.request.urlopen(urlpage)
