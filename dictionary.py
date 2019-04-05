@@ -1,6 +1,4 @@
 
-# 
-
 d = {'Izvoli': {
     'izvoli': 'Izvoli?'},
      'FOI': {

@@ -10,8 +10,6 @@ from time import sleep
 
 import pyperclip as cp
 
-from pyautogui import press
-
 import webbrowser
 
 import subprocess
@@ -37,8 +35,12 @@ LAST_SENTENCE = 'First input'
 # First input is not heard
 FIRTS = True
 
-startupinfo = subprocess.STARTUPINFO()
-startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+import platform
+if platform.system() == 'windows':
+    startupinfo = subprocess.STARTUPINFO()
+    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+else:
+    startupinfo = None
 
 def refresh(slide):
     p = subprocess.Popen(['hovercraft', os.path.join('slides', slide), 'build'],
@@ -47,7 +49,7 @@ def refresh(slide):
     dirname = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(dirname, 'build/index.html')
     if DRIVER is not None:
-        DRIVER.get(filename)
+        DRIVER.get("file://" + filename)
         DRIVER.refresh()
 
 class FiniteStateMachine:
@@ -276,7 +278,7 @@ if __name__ == '__main__':
     while True:
         
         '''try:'''        
-        listen()               
+        listen()
         '''except Exception:
             pass
             print('Ponovi unos')'''
