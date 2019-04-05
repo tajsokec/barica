@@ -2,7 +2,7 @@
 
 B.A.R.I.C.A. assistant is a recursive acronym standing for "Barica is an ARtificial Intelligence Cognitive Agent". Playing with acronyms is fun, but really Barica is a traditional name from Hrvatsko Zagorje, a northern part of Croatia where our Faculty resides. B.A.R.I.C.A. assistant is designed for helping students on the Faculty of Organization and Informatics by giving them useful information about classroom location, professors and schedule. 
 
-![Use case diagram for B.A.R.I.C.A. assistant]()
+![Use case diagram for B.A.R.I.C.A. assistant](images/use_cese_eng.png)
 
 ## Getting Started
 
