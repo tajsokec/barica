@@ -10,7 +10,25 @@ To get start copy project and run the program on your local machine by next inst
 
 ### Prerequisites
 
-You can start the program in Python3 on a Windows or Linux system.
+You can start the program in Python3 on a Windows or Linux system. Open the command line (Windows) or terminal (Linux), go to the program directory and execute next commands.
+
+Windows
+```
+pip install -r requirements.txt
+
+python talk.py --train
+
+```
+
+Linux
+```
+pip3 install -r requirements.txt
+
+python3 talk.py --train
+
+```
+
+Then, go to https://voicenotebook.com/. Install Chrome extensions. Choose speech language Croatian and check Transfer to clipboard. Click Start recording.
 
 ## Running
 
@@ -18,16 +36,12 @@ For running the program open the command line (Windows) or terminal (Linux), go 
 
 Windows
 ```
-python talk.py --train
-
 python talk.py
 
 ```
 
 Linux
 ```
-python3 talk.py --train
-
 python3 talk.py
 
 ```
