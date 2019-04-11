@@ -28,9 +28,9 @@ python3 talk.py --train
 
 ```
 
-Then, go to https://voicenotebook.com/ in Chrome browser. Install Chrome extensions. Choose speech language Croatian and check Transfer to clipboard. Click Start recording.
-
 ## Running
+
+Go to https://voicenotebook.com/ in Chrome browser. Install Chrome extensions. Choose speech language Croatian and check Transfer to clipboard. Click Start recording.
 
 For running the program open the command line (Windows) or terminal (Linux), go to the program directory and execute next commands.
 
