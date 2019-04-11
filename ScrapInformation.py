@@ -51,8 +51,11 @@ def scrapProfessorsForPresentation():
 
     print('--> SCRAP PROFESSORS FOR PRESENTATION')
 
-    if not os.path.exists('build\images\professors'):
-        os.makedirs('build\images\professors')
+    dirname = os.path.dirname(os.path.abspath('__file__'))
+    filename = os.path.join(dirname, 'build/images/professors')
+    
+    if not os.path.exists(filename):
+        os.makedirs(filename)
 
     professors = scrapProfessorsForTrain()
 
@@ -66,9 +69,8 @@ def scrapProfessorsForPresentation():
         driver.get('https://nastava.foi.hr/?username=' + user_name)
         user_name_split = user_name.split('#')
         driver.find_element_by_id("teacherRightContentPanel").screenshot(
-        os.path.join('build\images\professors', user_name_split[0]+ '.png'))
+        os.path.join(filename, user_name_split[0]+ '.png'))
         print('spremljeno')
-
 
 def scrapSchedule(kind_of_study, year_of_study, group):
 
