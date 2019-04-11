@@ -4,6 +4,8 @@ from chatterbot import ChatBot
 
 import argparse
 
+from pyautogui import press
+
 import sys
 
 from time import sleep
@@ -16,6 +18,16 @@ import subprocess
 
 import os
 
+from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
+
+import _thread
+
+from collections import OrderedDict
+
+from threading import Timer
+
+from ScrapInformation import *
+
 from selenium import webdriver
 # Global driver 
 DRIVER = None
@@ -23,17 +35,16 @@ DRIVER = None
 from dictionary import *
 d = dictionary()
 
-from ScrapProfesssor import *
-
-from ScrapGroups import *
-
-from ScrapSchedule import *
-
 # Last sentence
 LAST_SENTENCE = 'First input'
 
 # First input is not heard
 FIRTS = True
+
+# Websocket communication buffer (e.g. messages to be sent)
+BUFFER = []
+
+driver_for_shown_schedule = None
 
 import platform
 if platform.system() == 'windows':
@@ -42,19 +53,42 @@ if platform.system() == 'windows':
 else:
     startupinfo = None
 
-def refresh(slide):
-    p = subprocess.Popen(['hovercraft', os.path.join('slides', slide), 'build'],
-                         startupinfo=startupinfo)
-    sleep(1)
+def go_to_x_slide(x):
     dirname = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.join(dirname, 'build/index.html')
-    if DRIVER is not None:
-        DRIVER.get("file://" + filename)
-        DRIVER.refresh()
+    DRIVER.get('file://' + filename + '#/step-' + x)
+
+def timeout_schedule_close():
+    global driver_for_shown_schedule
+    if driver_for_shown_schedule != None:
+        close_schedule()
+
+class NLPController(WebSocket):
+
+    def __init__( self, *args, **kwargs ):
+        WebSocket.__init__( self, *args, **kwargs )
+        _thread.start_new_thread( self.listen, () )
+        
+
+    def listen( self ):
+        global BUFFER
+        while True:
+            try:
+                if BUFFER:
+                    BUFFER = list( OrderedDict.fromkeys( BUFFER ) )                   
+                    cmd = BUFFER.pop()
+                    self.sendMessage(str(cmd))
+                sleep( 0.5 )
+            except Exception as e:
+                print(e)
+        
+    def handleMessage( self ):
+        self.sendMessage( self.data )
+
+    def handleClose( self ):
+        sys.exit()
 
 class FiniteStateMachine:
-
-    refresh('professor.rst')
     
     states = ['listen', 'yes', 'foi_generally', 'which_classroom', 'classroom', 'which_professor',
               'professor', 'which_kind_of_study', 'which_year_of_study', 'which_group', 'schedule']
@@ -91,7 +125,7 @@ class FiniteStateMachine:
         self.machine.add_transition('listen_input', '*', 'listen')
 
     def foi_generally_output(self):
-        refresh('foi_generally.rst')
+        go_to_x_slide('2')
         print(d['FOI'][self.CMD])
         self.listen_input()
 
@@ -99,40 +133,42 @@ class FiniteStateMachine:
         self.listen_input()
 
     def professor_output(self):
-        p = subprocess.Popen(['hovercraft', os.path.join('slides', 'professor.rst'), 'build'],
-                         startupinfo=startupinfo)
-        sleep(1)
-        scrapProfessors(self.professor)
-        dirname = os.path.dirname(os.path.abspath(__file__))
-        filename = os.path.join(dirname, 'build/index.html')
-        DRIVER.get(filename)
-        DRIVER.refresh()
-        print(d['Profesori'][self.CMD])
+        go_to_x_slide('3')
+        global BUFFER
+        name = str(self.professor).split('#')
+        BUFFER.append('PROFESOR ' + name[0])
         self.listen_input()
 
     def kind_of_study_output(self):
-        refresh('kind_of_study.rst')
+        go_to_x_slide('4')
         print(d['Raspored'][self.CMD])
 
     def year_of_study_output(self):
-        refresh('year_of_study.rst')
+        go_to_x_slide('5')
         print(d['Vrsta_studija'][self.CMD])
 
     def groupN_output(self):
         there_is_schedule = scrapGroups(str(self.kind_of_study), str(self.year_of_study))
-        if there_is_schedule:
-            refresh('groupN.rst')
+        if there_is_schedule != 'Nema':
+            global BUFFER
+            BUFFER.append('GROUPS ' + str(there_is_schedule))
+            go_to_x_slide('6')
             print(d['Godina_studija'][self.CMD])
         else:
-            refresh('no_schedule.rst')
+            go_to_x_slide('7')
             print('Raspored nedostupan')
             self.listen_input()
 
     def schedule_output(self):
-        scrapSchedule(str(self.kind_of_study), str(self.year_of_study), str(self.group))
-        refresh('schedule.rst')
+        global driver_for_shown_schedule
+        driver_for_shown_schedule = scrapSchedule(str(self.kind_of_study),
+                                       str(self.year_of_study), str(self.group))
+        driver_for_shown_schedule.switch_to_window(driver_for_shown_schedule.current_window_handle)
+        timer_schedule = Timer(2 * 60, timeout_schedule_close)
+        timer_schedule.start()
         print(d['Grupa'][self.CMD])
         self.listen_input()
+
     
 def main_branch(SENTENCE):
     CMD = chatbot.get_response( SENTENCE )
@@ -177,6 +213,7 @@ def schedule_branch(SENTENCE):
         m.year_of_study = CMD
         m.year_of_study_input()
     elif CMD in d['Grupa']:
+        print(CMD)
         m.group = CMD
         m.groupN_input()
     else: print(CMD)
@@ -198,16 +235,29 @@ def processing_input():
     elif m.state == 'which_kind_of_study' or m.state == 'which_year_of_study' or m.state == 'which_group':
         schedule_branch(SENTENCE)
 
+def close_schedule():
+    global driver_for_shown_schedule
+    driver_for_shown_schedule.close()
+    driver_for_shown_schedule = None
+
 def listen():
     global LAST_SENTENCE
     sleep( 0.5 )
     l = cp.paste().lower()
     if l != LAST_SENTENCE:
-            x = LAST_SENTENCE
-            LAST_SENTENCE = l            
-            if x is not 'First input':
-                print( 'Heard:', l )
-                processing_input()
+        global driver_for_shown_schedule
+        if driver_for_shown_schedule != None: close_schedule()
+        x = LAST_SENTENCE
+        LAST_SENTENCE = l            
+        if x is not 'First input':
+            print( 'Heard:', l )
+            processing_input()
+
+def start_presentation():
+    p = subprocess.Popen(['hovercraft', os.path.join('slides', 'listen.rst'), 'build'],
+                         startupinfo=startupinfo)
+    sleep(1)
+    go_to_x_slide('1')
 
 if __name__ == '__main__':
 
@@ -266,18 +316,22 @@ if __name__ == '__main__':
             train( chatbot )
             trainClassroom( chatbotClassroom )
             trainProfessor( chatbotProfessor )
-            trainSchedule ( chatbotSchedule ) 
+            trainSchedule ( chatbotSchedule )
+            scrapProfessorsForPresentation()
             sys.exit()
-    
+
+    server = SimpleWebSocketServer( '', 8009, NLPController )
+    _thread.start_new_thread( server.serveforever, () )
+            
     m = FiniteStateMachine()
 
     # Change to execute in the another browser
     DRIVER = webdriver.Chrome()
-    refresh('listen.rst')
+    start_presentation()
     
     while True:
         
-        '''try:'''        
+        '''try:'''
         listen()
         '''except Exception:
             pass

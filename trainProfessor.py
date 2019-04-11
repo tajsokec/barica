@@ -1,8 +1,8 @@
 
 from chatterbot.trainers import ListTrainer
 
-from ScrapProfesssors import *
-professors = scrapProfessors()
+from ScrapInformation import scrapProfessorsForTrain
+professors = scrapProfessorsForTrain()
 
 def trainProfessor( bot ):
         chatbot = ListTrainer( bot )
@@ -57,6 +57,8 @@ def trainProfessor( bot ):
 		'miš u džepu',
 		'mdzeko#nastavnici'
 	])
+
+
 
 
 
