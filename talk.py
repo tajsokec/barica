@@ -196,7 +196,10 @@ def main_branch(SENTENCE):
 
 def classroom_branch(SENTENCE):
     CMD = chatbotClassroom.get_response( SENTENCE )
-    if CMD in d['Dvorane']:
+    if CMD in d['Izvoli']:
+        m.barice_input()
+        print(d['Izvoli'][CMD])
+    elif CMD in d['Dvorane']:
         m.classroomN_input()
         print(d['Dvorane'][CMD])
     else: print(CMD)
@@ -204,7 +207,10 @@ def classroom_branch(SENTENCE):
 def professor_branch(SENTENCE):
     CMD = chatbotProfessor.get_response( SENTENCE )
     m.CMD = CMD
-    if CMD in d['Profesori']:
+    if CMD in d['Izvoli']:
+        m.barice_input()
+        print(d['Izvoli'][CMD])
+    elif CMD in d['Profesori']:
         m.professor = CMD
         m.professorN_input()
     else: print(CMD)
@@ -212,7 +218,10 @@ def professor_branch(SENTENCE):
 def schedule_branch(SENTENCE):
     CMD = chatbotSchedule.get_response( SENTENCE )
     m.CMD = CMD
-    if CMD in d['Vrsta_studija']:
+    if CMD in d['Izvoli']:
+        m.barice_input()
+        print(d['Izvoli'][CMD])
+    elif CMD in d['Vrsta_studija']:
         m.kind_of_study = CMD
         m.kind_of_study_input()
     elif CMD in d['Godina_studija']:

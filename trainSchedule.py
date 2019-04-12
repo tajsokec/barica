@@ -154,6 +154,34 @@ def trainSchedule( bot ):
                         b_name,
                         g
                 ])
+
+    chatbot.train([
+		'Barice',
+		'izvoli'
+	])
+
+    chatbot.train([
+            'Marice',
+            'izvoli'
+    ])
+
+
+    chatbot.train([
+            'Zorice',
+            'izvoli'
+    ])
+
+
+    chatbot.train([
+            'Starice',
+            'izvoli'
+    ])
+
+
+    chatbot.train([
+            'Varice',
+            'izvoli?'
+    ])
                 
 
     
