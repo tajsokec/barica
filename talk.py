@@ -26,6 +26,8 @@ from collections import OrderedDict
 
 from threading import Timer
 
+from resettabletimer import ResettableTimer
+
 from ScrapInformation import *
 
 from selenium import webdriver
@@ -59,6 +61,13 @@ def timeout_schedule_close():
     global driver_for_shown_schedule
     if driver_for_shown_schedule != None:
         close_schedule()
+
+def timeout_command():
+    m.listen_input()
+    cp.copy('refresh_command')
+    go_to_x_slide('1')
+timer_command = ResettableTimer(45, timeout_command)
+timer_command.start()
 
 class NLPController(WebSocket):
 
@@ -97,7 +106,7 @@ class FiniteStateMachine:
                                initial='listen')
         
         # Add transitions (trigger, source_state, destination_state)
-        self.machine.add_transition('barice_input', 'listen', 'yes')
+        self.machine.add_transition('barice_input', '*', 'yes')
         
         self.machine.add_transition('foi_input', 'yes', 'foi_generally',
                                     after='foi_generally_output')
@@ -242,13 +251,15 @@ def listen():
     sleep( 0.5 )
     l = cp.paste().lower()
     if l != LAST_SENTENCE:
-        global timer_command
-        global driver_for_shown_schedule
-        if driver_for_shown_schedule != None: close_schedule()
-        x = LAST_SENTENCE
-        LAST_SENTENCE = l
-        print( 'Heard:', l )
-        processing_input()
+        if l != 'refresh_command':
+            global timer_command
+            timer_command.reset()
+            global driver_for_shown_schedule
+            if driver_for_shown_schedule != None: close_schedule()
+            x = LAST_SENTENCE
+            LAST_SENTENCE = l
+            print( 'Heard:', l )
+            processing_input()
 
 def start_presentation():
     p = subprocess.Popen(['hovercraft', os.path.join('slides', 'listen.rst'), 'build'],

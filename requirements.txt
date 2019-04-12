@@ -8,3 +8,4 @@ SimpleWebSocketServer==0.1.1
 beautifulsoup4==4.7.1
 requests==2.21.0
 hovercraft==2.6
+resettabletimer==0.7.0
