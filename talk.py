@@ -36,10 +36,7 @@ from dictionary import *
 d = dictionary()
 
 # Last sentence
-LAST_SENTENCE = 'First input'
-
-# First input is not heard
-FIRTS = True
+LAST_SENTENCE = cp.paste().lower()
 
 # Websocket communication buffer (e.g. messages to be sent)
 BUFFER = []
@@ -222,7 +219,7 @@ def processing_input():
     global LAST_SENTENCE
     SENTENCE = LAST_SENTENCE
     
-    if SENTENCE == 'exit':
+    if SENTENCE == 'izlaz':
         DRIVER.close()
         sys.exit()
         
@@ -245,13 +242,13 @@ def listen():
     sleep( 0.5 )
     l = cp.paste().lower()
     if l != LAST_SENTENCE:
+        global timer_command
         global driver_for_shown_schedule
         if driver_for_shown_schedule != None: close_schedule()
         x = LAST_SENTENCE
-        LAST_SENTENCE = l            
-        if x is not 'First input':
-            print( 'Heard:', l )
-            processing_input()
+        LAST_SENTENCE = l
+        print( 'Heard:', l )
+        processing_input()
 
 def start_presentation():
     p = subprocess.Popen(['hovercraft', os.path.join('slides', 'listen.rst'), 'build'],
