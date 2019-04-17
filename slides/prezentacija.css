@@ -50,11 +50,15 @@ table {
 	font-size: 50%;
 }
 
-#ThreeD H1 {
-    font-family: Racing Sans One;
-    font-size: 300%;
+#btn_play{
+  cursor: pointer;
+  height: 50px;
+  width: 50px;
+  position: absolute;
+  top: 550px;
+  left: 215px;
+  border: 1px solid #000;
+  background-size: cover;
 }
 
-#thequestion p {
-    font-family: Racing Sans One;
-}
+

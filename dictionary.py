@@ -2,13 +2,13 @@
 d = {'Izvoli': {
     'izvoli': 'Izvoli?'},
      'FOI': {
-         'foi': 'Faklutet organizacije i informatike jedna je od sastavnica Sveučilišta u Zagrebu. FOI je visokoobrazovna ustanova u interdisciplinarnom području informatike, organizacije i poslovanja. Studijski programi utemeljeni su na modernim svjetskim modelima, načelima Bolonjske deklaracije i ECTS bodovnom sustavu.'},
+         'foi': 'Fakultet organizacije i informatike jedna je od sastavnica Sveučilišta u Zagrebu. FOI je visokoobrazovna ustanova u interdisciplinarnom području informatike, organizacije i poslovanja. Studijski programi utemeljeni su na modernim svjetskim modelima, načelima Bolonjske deklaracije i ECTS bodovnom sustavu.'},
      'Dvorana': {
          'dvorana': 'Koja dvorana?'},
      'Profesor': {
          'profesor': 'Koji profesor?'},
      'Raspored': {
-         'raspored': 'Za koji vrstu studija trebaš raspored?'},
+         'raspored': 'Za koju vrstu studija trebaš raspored?'},
     'Dvorane': {
     'd9': 'Dvorana devet se nalazi u podrumu, u istočnom krilu zgrade',
     'info': 'Info Klub kafić se nalazi u podrumu, u istočnom krilu zgrade',
@@ -55,9 +55,9 @@ d = {'Izvoli': {
              '52162': 'Za koju godinu studija trebaš raspored?',
              },
      'Godina_studija': {
-             '1': 'Za koji grupu trebaš raspored?',
-             '2': 'Za koji grupu trebaš raspored?',
-             '3': 'Za koji grupu trebaš raspored?',
+             '1': 'Za koju grupu trebaš raspored?',
+             '2': 'Za koju grupu trebaš raspored?',
+             '3': 'Za koju grupu trebaš raspored?',
              }}
 
 from ScrapInformation import scrapProfessorsForTrain, scrapAllGroups

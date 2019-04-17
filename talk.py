@@ -133,6 +133,8 @@ class FiniteStateMachine:
     def foi_generally_output(self):
         go_to_x_slide('2')
         print(d['FOI'][self.CMD])
+        global BUFFER
+        BUFFER.append('FOI')
         self.listen_input()
 
     def classroom_output(self):
@@ -148,24 +150,30 @@ class FiniteStateMachine:
     def kind_of_study_output(self):
         go_to_x_slide('4')
         print(d['Raspored'][self.CMD])
+        global BUFFER
+        BUFFER.append('KOJA_VRSTA_STUDIJA')
 
     def year_of_study_output(self):
         go_to_x_slide('5')
         print(d['Vrsta_studija'][self.CMD])
+        global BUFFER
+        BUFFER.append('KOJA_GODINA')
 
     def groupN_output(self):
+        global BUFFER
         there_is_schedule = scrapGroups(str(self.kind_of_study), str(self.year_of_study))
         if there_is_schedule != 'Nema':
-            global BUFFER
             BUFFER.append('GROUPS ' + str(there_is_schedule))
             go_to_x_slide('6')
             print(d['Godina_studija'][self.CMD])
         else:
             go_to_x_slide('7')
             print('Raspored nedostupan')
+            BUFFER.append('RASPORED_NE_POSTOJI')
             self.listen_input()
 
     def schedule_output(self):
+        global BUFFER
         global driver_for_shown_schedule
         driver_for_shown_schedule = scrapSchedule(str(self.kind_of_study),
                                        str(self.year_of_study), str(self.group))
@@ -173,36 +181,43 @@ class FiniteStateMachine:
         timer_schedule = Timer(2 * 60, timeout_schedule_close)
         timer_schedule.start()
         print(d['Grupa'][self.CMD])
+        BUFFER.append('RASPORED')
         self.listen_input()
 
     
 def main_branch(SENTENCE):
+    global BUFFER
     CMD = chatbot.get_response( SENTENCE )
     m.CMD = CMD
     if CMD in d['Izvoli']:
         m.barice_input()
-        print(d['Izvoli'][CMD])
+        print(d['Izvoli'][CMD])        
+        BUFFER.append('IZVOLI')
     elif CMD in d['FOI']:
         m.foi_input()
     elif CMD in d['Dvorana']:
         m.classroom_input()
         print(d['Dvorana'][CMD])
+        BUFFER.append('KOJA_DVORANA')
     elif CMD in d['Profesor']:
         m.professor_input()
         print(d['Profesor'][CMD])
+        BUFFER.append('KOJI_PROFESOR')
     elif CMD in d['Raspored']:
         m.schedule_input()       
-    else: print(CMD)
+    else: BUFFER.append('PONOVI')
 
 def classroom_branch(SENTENCE):
     CMD = chatbotClassroom.get_response( SENTENCE )
     if CMD in d['Izvoli']:
         m.barice_input()
         print(d['Izvoli'][CMD])
+        BUFFER.append('IZVOLI')
     elif CMD in d['Dvorane']:
         m.classroomN_input()
         print(d['Dvorane'][CMD])
-    else: print(CMD)
+        BUFFER.append('DVORANA ' + str(CMD))
+    else: BUFFER.append('PONOVI')
     
 def professor_branch(SENTENCE):
     CMD = chatbotProfessor.get_response( SENTENCE )
@@ -210,10 +225,11 @@ def professor_branch(SENTENCE):
     if CMD in d['Izvoli']:
         m.barice_input()
         print(d['Izvoli'][CMD])
+        BUFFER.append('IZVOLI')
     elif CMD in d['Profesori']:
         m.professor = CMD
         m.professorN_input()
-    else: print(CMD)
+    else: BUFFER.append('PONOVI')
 
 def schedule_branch(SENTENCE):
     CMD = chatbotSchedule.get_response( SENTENCE )
@@ -221,6 +237,7 @@ def schedule_branch(SENTENCE):
     if CMD in d['Izvoli']:
         m.barice_input()
         print(d['Izvoli'][CMD])
+        BUFFER.append('IZVOLI')
     elif CMD in d['Vrsta_studija']:
         m.kind_of_study = CMD
         m.kind_of_study_input()
@@ -231,15 +248,15 @@ def schedule_branch(SENTENCE):
         print(CMD)
         m.group = CMD
         m.groupN_input()
-    else: print(CMD)
+    else: BUFFER.append('PONOVI')
 
 def processing_input():
     global LAST_SENTENCE
     SENTENCE = LAST_SENTENCE
     
     if SENTENCE == 'izlaz':
-        DRIVER.close()
-        sys.exit()
+        DRIVER.quit()
+        os._exit(1)
         
     if m.state == 'listen' or  m.state == 'yes': main_branch(SENTENCE)
         
@@ -249,6 +266,8 @@ def processing_input():
 
     elif m.state == 'which_kind_of_study' or m.state == 'which_year_of_study' or m.state == 'which_group':
         schedule_branch(SENTENCE)
+
+    else: BUFFER.append('PONOVI')
 
 def close_schedule():
     global driver_for_shown_schedule
@@ -271,7 +290,7 @@ def listen():
             processing_input()
 
 def start_presentation():
-    p = subprocess.Popen(['hovercraft', os.path.join('slides', 'listen.rst'), 'build'],
+    p = subprocess.Popen(['hovercraft', os.path.join('slides', 'prezentacija.rst'), 'build'],
                          startupinfo=startupinfo)
     sleep(1)
     go_to_x_slide('1')
@@ -290,7 +309,7 @@ if __name__ == '__main__':
         },
         {
             'import_path': 'chatterbot.logic.LowConfidenceAdapter',
-            'threshold': 0.65,
+            'threshold': 0.75,
             'default_response': 'Ponovi unos molim.'
         }
     ]
@@ -308,16 +327,7 @@ if __name__ == '__main__':
     chatbotProfessor = ChatBot(
         'BARICA_HR_PROFESSOR',
         read_only=not TRAIN,
-        logic_adapters=[
-        {
-            'import_path': 'chatterbot.logic.BestMatch'
-        },
-        {
-            'import_path': 'chatterbot.logic.LowConfidenceAdapter',
-            'threshold': 0.75,
-            'default_response': 'Ponovi unos molim.'
-        }
-    ],
+        logic_adapters=la,
         database='dbP.sqlite3' )
     chatbotSchedule= ChatBot(
         'BARICA_HR_SCHEDULE',
