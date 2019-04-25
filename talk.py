@@ -290,7 +290,7 @@ def listen():
             processing_input()
 
 def start_presentation():
-    p = subprocess.Popen(['hovercraft', os.path.join('slides', 'prezentacija.rst'), 'build'],
+    p = subprocess.Popen(['hovercraft', os.path.join('presentation', 'prezentacija.rst'), 'build'],
                          startupinfo=startupinfo)
     sleep(1)
     go_to_x_slide('1')
@@ -309,7 +309,7 @@ if __name__ == '__main__':
         },
         {
             'import_path': 'chatterbot.logic.LowConfidenceAdapter',
-            'threshold': 0.75,
+            'threshold': 0.85,
             'default_response': 'Ponovi unos molim.'
         }
     ]
@@ -358,8 +358,8 @@ if __name__ == '__main__':
     
     while True:
         
-        '''try:'''
-        listen()
-        '''except Exception:
+        try:
+            listen()
+        except Exception:
             pass
-            print('Ponovi unos')'''
+            BUFFER.append('PONOVI')

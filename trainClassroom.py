@@ -214,16 +214,6 @@ def trainClassroom( bot ):
 	])
 
 	chatbot.train([
-		'dvorana 12',
-		'lab12'
-	])
-
-	chatbot.train([
-		'dvoranu 12',
-		'lab12'
-	])
-
-	chatbot.train([
 		'laboratorij 13',
 		'lab13'
 	])
@@ -434,7 +424,7 @@ def trainClassroom( bot ):
 	])
 
 	chatbot.train([
-		'dvorana dva',
+		'dvorana 2',
 		'd2'
 	])
 
