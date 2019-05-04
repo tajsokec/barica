@@ -309,7 +309,7 @@ if __name__ == '__main__':
         },
         {
             'import_path': 'chatterbot.logic.LowConfidenceAdapter',
-            'threshold': 0.85,
+            'threshold': 0.75,
             'default_response': 'Ponovi unos molim.'
         }
     ]
